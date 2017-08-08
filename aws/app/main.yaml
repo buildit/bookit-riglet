@@ -14,7 +14,7 @@ Parameters:
     Type: String
 
   BuildArtifactsBucket:
-    Default: myrig.awsrig.dmacedo.build
+    Default: rig.awsrig.dmacedo.build
     Description: Build Artifacts S3 Bucket
     Type: String
 
@@ -32,7 +32,7 @@ Parameters:
     Type: String
 
   InfraDevBucket:
-    Default: myrig.awsrig.dmacedo.infradev
+    Default: rig.awsrig.dmacedo.infradev
     Description: InfraDev S3 Bucket
     Type: String
 
@@ -81,54 +81,57 @@ Parameters:
 
 Resources:
 
-  LoadBalancer:
+  ServerLoadBalancer:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: !Sub https://s3.amazonaws.com/${InfraDevBucket}/${Environment}/templates/load-balancer.yaml
       Parameters:
-        AppStackName: !Ref AppStackName
+        AppStackName: !Sub ${AppStackName}-server
         FoundationStackName: !Ref FoundationStackName
         DnsHostedZoneName: riglet.io
-        DnsSubdomainName: bookit-server
+        DnsSubdomainName: !Sub ${Environment}-bookit-server
+
+  WebLoadBalancer:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub https://s3.amazonaws.com/${InfraDevBucket}/${Environment}/templates/load-balancer.yaml
+      Parameters:
+        AppStackName: !Sub ${AppStackName}-web
+        FoundationStackName: !Ref FoundationStackName
+        DnsHostedZoneName: riglet.io
+        DnsSubdomainName: !Sub ${Environment}-bookit-web
 
   Cluster:
     DependsOn:
-      - LoadBalancer
+      - ServerLoadBalancer
+      - WebLoadBalancer
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: !Sub https://s3.amazonaws.com/${InfraDevBucket}/${Environment}/templates/ecs-cluster.yaml
       Parameters:
         AppStackName: !Ref AppStackName
         FoundationStackName: !Ref FoundationStackName
-        SourceSecurityGroup: !GetAtt LoadBalancer.Outputs.SecurityGroup
+        ServerSourceSecurityGroup: !GetAtt ServerLoadBalancer.Outputs.SecurityGroup
+        WebSourceSecurityGroup: !GetAtt WebLoadBalancer.Outputs.SecurityGroup
         InstanceType: !Ref EcsInstanceType
         ClusterSize: !Ref EcsClusterSize
         SshKeyName: !Ref SshKeyName
 
-#  DeploymentPipeline:
-#    DependsOn:
-#      - Cluster
-#      - LoadBalancer
-#    Type: AWS::CloudFormation::Stack
-#    Properties:
-#      TemplateURL: !Sub https://s3.amazonaws.com/${InfraDevBucket}/${Environment}/templates/deployment-pipeline.yaml
-#      Parameters:
-#        AppStackName: !Ref AppStackName
-#        BuildArtifactsBucket: !Ref BuildArtifactsBucket
-#        InfraDevBucket: !Ref InfraDevBucket
-#        Cluster: !GetAtt Cluster.Outputs.ClusterName
-#        RepositoryName: !Ref RepositoryName
-#        RepositoryBranch: !Ref RepositoryBranch
-#        RepositoryAuthToken: !Ref RepositoryAuthToken
-#        TargetGroup: !GetAtt LoadBalancer.Outputs.TargetGroup
-
-  Repository:
+  ServerRepository:
     Type: AWS::ECR::Repository
     # Hate to do this, but this *will* cause stack-deletion errors if the repo
     # has any images in it, which any self-respecting repo will have.
-#    DeletionPolicy: Retain
+    DeletionPolicy: Retain
     Properties:
-      RepositoryName: !Join [ '-', [ !Ref AppStackName, 'ecr', 'repo' ] ]
+      RepositoryName: !Join [ '-', [ !Ref AppStackName, 'server', 'ecr', 'repo' ] ]
+
+  WebRepository:
+    Type: AWS::ECR::Repository
+    # Hate to do this, but this *will* cause stack-deletion errors if the repo
+    # has any images in it, which any self-respecting repo will have.
+    DeletionPolicy: Retain
+    Properties:
+      RepositoryName: !Join [ '-', [ !Ref AppStackName, 'web', 'ecr', 'repo' ] ]
 
   BookitServerService:
     DependsOn:
@@ -140,11 +143,30 @@ Resources:
         Tag: latest
         DesiredCount: 0
         Cluster: !GetAtt Cluster.Outputs.ClusterName
-        TargetGroup: !GetAtt LoadBalancer.Outputs.TargetGroup
-        Repository: !Ref Repository
+        TargetGroup: !GetAtt ServerLoadBalancer.Outputs.TargetGroup
+        Repository: !Ref ServerRepository
+        ContainerPort: 8888
+
+  BookitWebService:
+    DependsOn:
+      - Cluster
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub https://s3.amazonaws.com/${InfraDevBucket}/${Environment}/templates/service.yaml
+      Parameters:
+        Tag: latest
+        DesiredCount: 0
+        Cluster: !GetAtt Cluster.Outputs.ClusterName
+        TargetGroup: !GetAtt WebLoadBalancer.Outputs.TargetGroup
+        Repository: !Ref WebRepository
+        ContainerPort: 80
 
 Outputs:
 
-  LoadBalancerUrl:
+  ServerLoadBalancerUrl:
     Description: URL of the load balancer for the sample service.
-    Value: !GetAtt LoadBalancer.Outputs.ServiceUrl
+    Value: !GetAtt ServerLoadBalancer.Outputs.ServiceUrl
+
+  WebLoadBalancerUrl:
+    Description: URL of the load balancer for the sample service.
+    Value: !GetAtt WebLoadBalancer.Outputs.ServiceUrl

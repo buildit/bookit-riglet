@@ -21,7 +21,7 @@ Parameters:
     Type: String
 
   FoundationBucket:
-    Default: myrig.awsrig.dmacedo.foundation
+    Default: rig.awsrig.dmacedo.foundation
     Description: Foundation S3 Bucket
     Type: String
 

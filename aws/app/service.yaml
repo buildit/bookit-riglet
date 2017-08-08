@@ -21,6 +21,9 @@ Parameters:
   Repository:
     Type: String
 
+  ContainerPort:
+    Type: Number
+
 Resources:
   ECSServiceRole:
     Type: AWS::IAM::Role
@@ -46,7 +49,7 @@ Resources:
       TaskDefinition: !Ref TaskDefinition
       LoadBalancers:
         - ContainerName: app-deployment
-          ContainerPort: 8888
+          ContainerPort: !Ref ContainerPort
           TargetGroupArn: !Ref TargetGroup
 
 
@@ -88,7 +91,7 @@ Resources:
           Essential: true
           Memory: 128
           PortMappings:
-            - ContainerPort: 8888
+            - ContainerPort: !Ref ContainerPort
               HostPort: 0
           Environment:
             - Name: Tag

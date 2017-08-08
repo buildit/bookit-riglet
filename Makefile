@@ -5,10 +5,9 @@ export DOMAIN ?= example.tld
 export EMAIL ?= user@example.com
 export ENV ?= dev
 export KEY_NAME ?= ""
-export NAME_SUFFIX ?= myrig-test-bucket
+export NAME_SUFFIX ?= rig-test-bucket
 export PROFILE ?= default
 export PROJECT ?= projectname
-export RDS_ROOT_PASSWORD ?= $(shell cat ~/.myrig.rds_root_password)
 export REGION ?= us-east-1
 
 export AWS_PROFILE=${PROFILE}
@@ -38,7 +37,7 @@ create-foundation: upload
 		--parameters \
 			"ParameterKey=CidrBlock,ParameterValue=10.1.0.0/16" \
 			"ParameterKey=Environment,ParameterValue=${ENV}" \
-			"ParameterKey=FoundationBucket,ParameterValue=myrig.${PROJECT}.${NAME_SUFFIX}.${REGION}.foundation" \
+			"ParameterKey=FoundationBucket,ParameterValue=rig.${NAME_SUFFIX}.${PROJECT}.${REGION}.foundation" \
 			"ParameterKey=ProjectName,ParameterValue=${PROJECT}" \
 			"ParameterKey=PublicFQDN,ParameterValue=${DOMAIN}" \
 			"ParameterKey=Region,ParameterValue=${REGION}" \
@@ -52,18 +51,18 @@ create-foundation: upload
 
 ## Create new CF App stack
 create-app: upload-app
-	@aws cloudformation create-stack --stack-name "${PROJECT}-${ENV}-${NAME_SUFFIX}-app-${APP}" \
+	@aws cloudformation create-stack --stack-name "${PROJECT}-${ENV}-${NAME_SUFFIX}-${APP}" \
                 --region ${REGION} \
                 --disable-rollback \
 		--template-body "file://aws/app/main.yaml" \
 		--capabilities CAPABILITY_NAMED_IAM \
 		--parameters \
 			"ParameterKey=AppName,ParameterValue=${APP}" \
-			"ParameterKey=AppStackName,ParameterValue=${PROJECT}-${ENV}-${NAME_SUFFIX}-app-${APP}" \
-			"ParameterKey=BuildArtifactsBucket,ParameterValue=myrig.${PROJECT}.${NAME_SUFFIX}.${REGION}.build" \
+			"ParameterKey=AppStackName,ParameterValue=${PROJECT}-${ENV}-${NAME_SUFFIX}-${APP}" \
+			"ParameterKey=BuildArtifactsBucket,ParameterValue=rig.${NAME_SUFFIX}.${PROJECT}.${REGION}.build" \
 			"ParameterKey=Environment,ParameterValue=${ENV}" \
 			"ParameterKey=FoundationStackName,ParameterValue=${PROJECT}-${ENV}-${NAME_SUFFIX}-foundation" \
-			"ParameterKey=InfraDevBucket,ParameterValue=myrig.${PROJECT}.${NAME_SUFFIX}.${REGION}.infradev" \
+			"ParameterKey=InfraDevBucket,ParameterValue=rig.${NAME_SUFFIX}.${PROJECT}.${REGION}.infradev" \
 			"ParameterKey=ProjectName,ParameterValue=${PROJECT}" \
 			"ParameterKey=RepositoryName,ParameterValue=${REPO}" \
 			"ParameterKey=RepositoryBranch,ParameterValue=${REPO_BRANCH}" \
@@ -88,7 +87,7 @@ update-foundation: upload
 		--parameters \
 			"ParameterKey=CidrBlock,ParameterValue=10.1.0.0/16" \
 			"ParameterKey=Environment,ParameterValue=${ENV}" \
-			"ParameterKey=FoundationBucket,ParameterValue=myrig.${PROJECT}.${NAME_SUFFIX}.${REGION}.foundation" \
+			"ParameterKey=FoundationBucket,ParameterValue=rig.${NAME_SUFFIX}.${PROJECT}.${REGION}.foundation" \
 			"ParameterKey=ProjectName,ParameterValue=${PROJECT}" \
 			"ParameterKey=PublicFQDN,ParameterValue=${DOMAIN}" \
 			"ParameterKey=Region,ParameterValue=${REGION}" \
@@ -103,17 +102,17 @@ update-foundation: upload
 
 ## Update existing App CF Stack
 update-app: upload-app
-	@aws cloudformation update-stack --stack-name "${PROJECT}-${ENV}-${NAME_SUFFIX}-app-${APP}" \
+	@aws cloudformation update-stack --stack-name "${PROJECT}-${ENV}-${NAME_SUFFIX}-${APP}" \
                 --region ${REGION} \
 		--template-body "file://aws/app/main.yaml" \
 		--capabilities CAPABILITY_NAMED_IAM \
 		--parameters \
 			"ParameterKey=AppName,ParameterValue=${APP}" \
-			"ParameterKey=AppStackName,ParameterValue=${PROJECT}-${ENV}-${NAME_SUFFIX}-app-${APP}" \
-			"ParameterKey=BuildArtifactsBucket,ParameterValue=myrig.${PROJECT}.${NAME_SUFFIX}.${REGION}.build" \
+			"ParameterKey=AppStackName,ParameterValue=${PROJECT}-${ENV}-${NAME_SUFFIX}-${APP}" \
+			"ParameterKey=BuildArtifactsBucket,ParameterValue=rig.${NAME_SUFFIX}.${PROJECT}.${REGION}.build" \
 			"ParameterKey=Environment,ParameterValue=${ENV}" \
 			"ParameterKey=FoundationStackName,ParameterValue=${PROJECT}-${ENV}-${NAME_SUFFIX}-foundation" \
-			"ParameterKey=InfraDevBucket,ParameterValue=myrig.${PROJECT}.${NAME_SUFFIX}.${REGION}.infradev" \
+			"ParameterKey=InfraDevBucket,ParameterValue=rig.${NAME_SUFFIX}.${PROJECT}.${REGION}.infradev" \
 			"ParameterKey=ProjectName,ParameterValue=${PROJECT}" \
 			"ParameterKey=RepositoryName,ParameterValue=${REPO}" \
 			"ParameterKey=RepositoryBranch,ParameterValue=${REPO_BRANCH}" \
@@ -147,7 +146,7 @@ outputs-foundation:
 status-app:
 	@aws cloudformation describe-stacks \
                 --region ${REGION} \
-		--stack-name "${PROJECT}-${ENV}-${NAME_SUFFIX}-app-${APP}" \
+		--stack-name "${PROJECT}-${ENV}-${NAME_SUFFIX}-${APP}" \
 		--query "Stacks[][StackStatus] | []" | jq
 
 
@@ -155,7 +154,7 @@ status-app:
 outputs-app:
 	@aws cloudformation describe-stacks \
                 --region ${REGION} \
-		--stack-name "${PROJECT}-${ENV}-${NAME_SUFFIX}-app-${APP}" \
+		--stack-name "${PROJECT}-${ENV}-${NAME_SUFFIX}-${APP}" \
 		--query "Stacks[][Outputs] | []" | jq
 
 
@@ -168,27 +167,27 @@ delete-foundation:
 ## Deletes the App CF stack
 delete-app:
 	@if ${MAKE} .prompt-yesno message="Are you sure you wish to delete the App ${APP} Stack?"; then \
-		aws cloudformation delete-stack --region ${REGION} --stack-name "${PROJECT}-${ENV}-${NAME_SUFFIX}-app-${APP}"; \
+		aws cloudformation delete-stack --region ${REGION} --stack-name "${PROJECT}-${ENV}-${NAME_SUFFIX}-${APP}"; \
 	fi
 
 ## Upload CF Templates to S3
 # Uploads foundation templates to the Foundation bucket
-# myrig.${PROJECT}.${NAME_SUFFIX}.${REGION}.foundation/${ENV}/templates/
+# rig.${NAME_SUFFIX}.${PROJECT}.${REGION}.foundation/${ENV}/templates/
 upload:
-	@aws s3 cp --recursive aws/foundation/ s3://myrig.${PROJECT}.${NAME_SUFFIX}.${REGION}.foundation/${ENV}/templates/
+	@aws s3 cp --recursive aws/foundation/ s3://rig.${NAME_SUFFIX}.${PROJECT}.${REGION}.foundation/${ENV}/templates/
 
 
 ## Upload CF Templates for APP
 # Note that these templates will be stored in your InfraDev Project **shared** bucket:
-# myrig.${PROJECT}.${NAME_SUFFIX}.${REGION}.infradev/${ENV}/templates/
+# rig.${NAME_SUFFIX}.${PROJECT}.${REGION}.infradev/${ENV}/templates/
 upload-app:
-	@aws s3 cp --recursive aws/app/ s3://myrig.${PROJECT}.${NAME_SUFFIX}.${REGION}.infradev/${ENV}/templates/
+	@aws s3 cp --recursive aws/app/ s3://rig.${NAME_SUFFIX}.${PROJECT}.${REGION}.infradev/${ENV}/templates/
 	pwd=$(shell pwd)
 	cd aws/app/ && zip templates.zip *.yaml
 	cd ${pwd}
-	@aws s3 cp aws/app/templates.zip s3://myrig.${PROJECT}.${NAME_SUFFIX}.${REGION}.infradev/${PROJECT}-${ENV}-${NAME_SUFFIX}-app-${APP}/templates/
+	@aws s3 cp aws/app/templates.zip s3://rig.${NAME_SUFFIX}.${PROJECT}.${REGION}.infradev/${PROJECT}-${ENV}-${NAME_SUFFIX}-${APP}/templates/
 	rm -rf aws/app/templates.zip
-	@aws s3 cp aws/app/service.yaml s3://myrig.${PROJECT}.${NAME_SUFFIX}.${REGION}.infradev/${PROJECT}-${ENV}-${NAME_SUFFIX}-app-${APP}/templates/
+	@aws s3 cp aws/app/service.yaml s3://rig.${NAME_SUFFIX}.${PROJECT}.${REGION}.infradev/${PROJECT}-${ENV}-${NAME_SUFFIX}-${APP}/templates/
 
 
 store-ubuntu-ami:
@@ -235,9 +234,6 @@ ifndef PROFILE
 endif
 ifndef PROJECT
 	$(error PROJECT is undefined, should be in file .make)
-endif
-ifndef RDS_ROOT_PASSWORD
-	$(error RDS_ROOT_PASSWORD is undefined, should be in file .make)
 endif
 ifndef REGION
 	$(error REGION is undefined, should be in file .make)
