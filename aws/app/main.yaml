@@ -1,0 +1,150 @@
+---
+
+Description: Application Deployment on ECS
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+  AppName:
+    Default: twig
+    Description: Application name
+    Type: String
+
+  AppStackName:
+    Description: App stack name
+    Type: String
+
+  BuildArtifactsBucket:
+    Default: myrig.awsrig.dmacedo.build
+    Description: Build Artifacts S3 Bucket
+    Type: String
+
+  Environment:
+    Default: tst
+    Description: Stack environment
+    Type: String
+
+  EcsClusterSize:
+    Type: Number
+    Default: 1
+
+  FoundationStackName:
+    Description: Foundation stack name
+    Type: String
+
+  InfraDevBucket:
+    Default: myrig.awsrig.dmacedo.infradev
+    Description: InfraDev S3 Bucket
+    Type: String
+
+  ProjectName:
+    Default: awsrig
+    Description: Project name
+    Type: String
+
+  RepositoryName:
+    AllowedPattern: '[\x20-\x7E]*'
+    ConstraintDescription: Can contain only ASCII characters.
+    Description: The name of the CodeCommit repo
+    Type: String
+
+  RepositoryBranch:
+    AllowedPattern: '[\x20-\x7E]*'
+    ConstraintDescription: Can contain only ASCII characters.
+    Default: master
+    Description: The name of the branch for the CodeCommit repo
+    Type: String
+
+  RepositoryAuthToken:
+    AllowedPattern: '[\x20-\x7E]*'
+    ConstraintDescription: Can contain only ASCII characters.
+    Description: The OAuth (or whatever) token required to obtain sources from your repo.
+    Type: String
+    NoEcho: true
+
+  Region:
+    Default: us-east-1
+    Description: Region
+    Type: String
+
+  EcsInstanceType:
+    Default: t2.medium
+    Description: Instance type of ECS cluster instance(s)
+    Type: String
+
+  SshKeyName:
+    Description: Name of keypair to use with managed instances.
+    Type: AWS::EC2::KeyPair::KeyName
+
+  UserName:
+    Description: User FirstLastName
+    Type: String
+
+Resources:
+
+  LoadBalancer:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub https://s3.amazonaws.com/${InfraDevBucket}/${Environment}/templates/load-balancer.yaml
+      Parameters:
+        AppStackName: !Ref AppStackName
+        FoundationStackName: !Ref FoundationStackName
+        DnsHostedZoneName: riglet.io
+        DnsSubdomainName: bookit-server
+
+  Cluster:
+    DependsOn:
+      - LoadBalancer
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub https://s3.amazonaws.com/${InfraDevBucket}/${Environment}/templates/ecs-cluster.yaml
+      Parameters:
+        AppStackName: !Ref AppStackName
+        FoundationStackName: !Ref FoundationStackName
+        SourceSecurityGroup: !GetAtt LoadBalancer.Outputs.SecurityGroup
+        InstanceType: !Ref EcsInstanceType
+        ClusterSize: !Ref EcsClusterSize
+        SshKeyName: !Ref SshKeyName
+
+#  DeploymentPipeline:
+#    DependsOn:
+#      - Cluster
+#      - LoadBalancer
+#    Type: AWS::CloudFormation::Stack
+#    Properties:
+#      TemplateURL: !Sub https://s3.amazonaws.com/${InfraDevBucket}/${Environment}/templates/deployment-pipeline.yaml
+#      Parameters:
+#        AppStackName: !Ref AppStackName
+#        BuildArtifactsBucket: !Ref BuildArtifactsBucket
+#        InfraDevBucket: !Ref InfraDevBucket
+#        Cluster: !GetAtt Cluster.Outputs.ClusterName
+#        RepositoryName: !Ref RepositoryName
+#        RepositoryBranch: !Ref RepositoryBranch
+#        RepositoryAuthToken: !Ref RepositoryAuthToken
+#        TargetGroup: !GetAtt LoadBalancer.Outputs.TargetGroup
+
+  Repository:
+    Type: AWS::ECR::Repository
+    # Hate to do this, but this *will* cause stack-deletion errors if the repo
+    # has any images in it, which any self-respecting repo will have.
+#    DeletionPolicy: Retain
+    Properties:
+      RepositoryName: !Join [ '-', [ !Ref AppStackName, 'ecr', 'repo' ] ]
+
+  BookitServerService:
+    DependsOn:
+      - Cluster
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub https://s3.amazonaws.com/${InfraDevBucket}/${Environment}/templates/service.yaml
+      Parameters:
+        Tag: latest
+        DesiredCount: 0
+        Cluster: !GetAtt Cluster.Outputs.ClusterName
+        TargetGroup: !GetAtt LoadBalancer.Outputs.TargetGroup
+        Repository: !Ref Repository
+
+Outputs:
+
+  LoadBalancerUrl:
+    Description: URL of the load balancer for the sample service.
+    Value: !GetAtt LoadBalancer.Outputs.ServiceUrl
