@@ -61,7 +61,7 @@ Resources:
         Region: !Ref Region
         SubnetPrivateCidrBlocks: !Join [ ",", !Ref SubnetPrivateCidrBlocks ]
         SubnetPublicCidrBlocks: !Join [ ",", !Ref SubnetPublicCidrBlocks ]
-      TemplateURL: !Sub https://s3.amazonaws.com/${FoundationBucket}/${Environment}/templates/vpc.yaml
+      TemplateURL: !Sub https://s3.amazonaws.com/${FoundationBucket}/templates/vpc.yaml
       TimeoutInMinutes: 60
 
   Dns:
@@ -71,7 +71,7 @@ Resources:
         Environment: !Ref Environment
         FoundationStackName: !Sub ${AWS::StackName}
         PublicFQDN: !Ref PublicFQDN
-      TemplateURL: !Sub https://s3.amazonaws.com/${FoundationBucket}/${Environment}/templates/dns.yaml
+      TemplateURL: !Sub https://s3.amazonaws.com/${FoundationBucket}/templates/dns.yaml
       TimeoutInMinutes: 60
 
   Nat:
@@ -82,7 +82,7 @@ Resources:
       Parameters:
         Environment: !Ref Environment
         FoundationStackName: !Sub ${AWS::StackName}
-      TemplateURL: !Sub https://s3.amazonaws.com/${FoundationBucket}/${Environment}/templates/nat.yaml
+      TemplateURL: !Sub https://s3.amazonaws.com/${FoundationBucket}/templates/nat.yaml
       TimeoutInMinutes: 60
 
 
