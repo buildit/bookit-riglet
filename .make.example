@@ -1,9 +1,8 @@
-APP = appname
 DOMAIN = example.tld
 EMAIL = jdoe@example.com
 ENV = dev
 KEY_NAME = username-us-east-1-keypair
-NAME_SUFFIX = jdoe
+OWNER = jdoe
 PROFILE = default
-PROJECT = appname
+PROJECT = mycoolproject
 REGION = us-east-1

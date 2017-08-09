@@ -15,12 +15,11 @@ This can either be done by copying settings from the template `.make.example`
 and save in a new file `.make`:
 
 ```
-APP = <Application name if you're doing more than Foundation stack>
 DOMAIN = <Domain to use for Foundation>
 EMAIL = <User contact e-mail>
 ENV = <Environment i.e.: tst, dev, stg, prd>
 KEY_NAME = <EC2 SSH key name>
-NAME_SUFFIX = <Your unique FirstLast name>
+OWNER = <The owner of the stack, either personal or corporate>
 PROFILE = <AWS Profile Name>
 PROJECT = <Project Name>
 REGION = <AWS Region>

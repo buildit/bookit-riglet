@@ -32,8 +32,7 @@ Parameters:
     Type: String
 
   InfraDevBucket:
-    Default: rig.awsrig.dmacedo.infradev
-    Description: InfraDev S3 Bucket
+    Description: App S3 Bucket
     Type: String
 
   ProjectName:
@@ -84,7 +83,7 @@ Resources:
   ServerLoadBalancer:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: !Sub https://s3.amazonaws.com/${InfraDevBucket}/${Environment}/templates/load-balancer.yaml
+      TemplateURL: !Sub https://s3.amazonaws.com/${InfraDevBucket}/templates/load-balancer.yaml
       Parameters:
         AppStackName: !Sub ${AppStackName}-server
         FoundationStackName: !Ref FoundationStackName
@@ -94,7 +93,7 @@ Resources:
   WebLoadBalancer:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: !Sub https://s3.amazonaws.com/${InfraDevBucket}/${Environment}/templates/load-balancer.yaml
+      TemplateURL: !Sub https://s3.amazonaws.com/${InfraDevBucket}/templates/load-balancer.yaml
       Parameters:
         AppStackName: !Sub ${AppStackName}-web
         FoundationStackName: !Ref FoundationStackName
@@ -107,7 +106,7 @@ Resources:
       - WebLoadBalancer
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: !Sub https://s3.amazonaws.com/${InfraDevBucket}/${Environment}/templates/ecs-cluster.yaml
+      TemplateURL: !Sub https://s3.amazonaws.com/${InfraDevBucket}/templates/ecs-cluster.yaml
       Parameters:
         AppStackName: !Ref AppStackName
         FoundationStackName: !Ref FoundationStackName
@@ -138,7 +137,7 @@ Resources:
       - Cluster
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: !Sub https://s3.amazonaws.com/${InfraDevBucket}/${Environment}/templates/service.yaml
+      TemplateURL: !Sub https://s3.amazonaws.com/${InfraDevBucket}/templates/service.yaml
       Parameters:
         Tag: latest
         DesiredCount: 0
@@ -152,7 +151,7 @@ Resources:
       - Cluster
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: !Sub https://s3.amazonaws.com/${InfraDevBucket}/${Environment}/templates/service.yaml
+      TemplateURL: !Sub https://s3.amazonaws.com/${InfraDevBucket}/templates/service.yaml
       Parameters:
         Tag: latest
         DesiredCount: 0
