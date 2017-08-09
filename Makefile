@@ -169,14 +169,12 @@ delete-app:
 
 ## Upload CF Templates to S3
 # Uploads foundation templates to the Foundation bucket
-# rig.${OWNER}.${PROJECT}.${ENV}.${REGION}.foundation/${ENV}/templates/
 upload:
 	@aws s3 cp --recursive cloudformation/foundation/ s3://rig.${OWNER}.${PROJECT}.${ENV}.${REGION}.foundation/templates/
 
 
 ## Upload CF Templates for project
 # Note that these templates will be stored in your InfraDev Project **shared** bucket:
-# rig.${OWNER}.${PROJECT}.${ENV}.${REGION}.app/${ENV}/templates/
 upload-app:
 	@aws s3 cp --recursive cloudformation/app/ s3://rig.${OWNER}.${PROJECT}.${ENV}.${REGION}.app/templates/
 	pwd=$(shell pwd)
@@ -185,6 +183,11 @@ upload-app:
 	@aws s3 cp cloudformation/app/templates.zip s3://rig.${OWNER}.${PROJECT}.${ENV}.${REGION}.app/templates/
 	rm -rf cloudformation/app/templates.zip
 	@aws s3 cp cloudformation/app/service.yaml s3://rig.${OWNER}.${PROJECT}.${ENV}.${REGION}.app/templates/
+
+## Upload app-deployment scripts to S3
+# Uploads the app-deployment scripts to the build bucket
+upload-app-deployment:
+	@aws s3 cp --recursive app-deployment/ s3://rig.${OWNER}.${PROJECT}.${ENV}.${REGION}.build/app-deployment/
 
 
 check-env:
