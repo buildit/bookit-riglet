@@ -100,7 +100,7 @@ update-foundation: upload
 
 ## Update existing App CF Stack
 update-app: upload-app
-	@aws cloudformation update-stack --stack-name "${OWNER}-${PROJECT}-${ENV}" \
+	@aws cloudformation update-stack --stack-name "${OWNER}-${PROJECT}-${ENV}-app" \
                 --region ${REGION} \
 		--template-body "file://cloudformation/app/main.yaml" \
 		--capabilities CAPABILITY_NAMED_IAM \
