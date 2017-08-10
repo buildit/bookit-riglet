@@ -159,6 +159,7 @@ Resources:
         TargetGroup: !GetAtt WebLoadBalancer.Outputs.TargetGroup
         Repository: !Ref WebRepository
         ContainerPort: 80
+        BookitApiDomainName: !Sub ${Environment}-bookit-server.riglet.io
 
 Outputs:
 
