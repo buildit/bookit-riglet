@@ -21,6 +21,10 @@ Parameters:
   Repository:
     Type: String
 
+  BookitApiDomainName:
+    Type: String
+    Default: example.com
+
   ContainerPort:
     Type: Number
 
@@ -98,3 +102,5 @@ Resources:
               Value: !Ref Tag
             - Name: USE_CLOUD
               Value: true
+            - Name: BOOKIT_API_BASE_URL
+              Value: !Ref BookitApiDomainName
