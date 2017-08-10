@@ -38,7 +38,7 @@ create-foundation: upload
 			"ParameterKey=Environment,ParameterValue=${ENV}" \
 			"ParameterKey=FoundationBucket,ParameterValue=rig.${OWNER}.${PROJECT}.${ENV}.${REGION}.foundation" \
 			"ParameterKey=ProjectName,ParameterValue=${PROJECT}" \
-			"ParameterKey=PublicFQDN,ParameterValue=${DOMAIN}" \
+			"ParameterKey=PublicDomainName,ParameterValue=${DOMAIN}" \
 			"ParameterKey=Region,ParameterValue=${REGION}" \
 			"ParameterKey=SubnetPrivateCidrBlocks,ParameterValue='10.1.11.0/24,10.1.12.0/24,10.1.13.0/24'" \
 			"ParameterKey=SubnetPublicCidrBlocks,ParameterValue='10.1.1.0/24,10.1.2.0/24,10.1.3.0/24'" \
@@ -69,6 +69,7 @@ create-app: upload-app
 			"ParameterKey=Region,ParameterValue=${REGION}" \
 			"ParameterKey=EcsInstanceType,ParameterValue=t2.small" \
 			"ParameterKey=SshKeyName,ParameterValue=${KEY_NAME}" \
+			"ParameterKey=PublicDomainName,ParameterValue=${DOMAIN}" \
 		--tags \
 			"Key=Email,Value=${EMAIL}" \
 			"Key=Environment,Value=${ENV}" \
@@ -87,7 +88,7 @@ update-foundation: upload
 			"ParameterKey=Environment,ParameterValue=${ENV}" \
 			"ParameterKey=FoundationBucket,ParameterValue=rig.${OWNER}.${PROJECT}.${ENV}.${REGION}.foundation" \
 			"ParameterKey=ProjectName,ParameterValue=${PROJECT}" \
-			"ParameterKey=PublicFQDN,ParameterValue=${DOMAIN}" \
+			"ParameterKey=PublicDomainName,ParameterValue=${DOMAIN}" \
 			"ParameterKey=Region,ParameterValue=${REGION}" \
 			"ParameterKey=SubnetPrivateCidrBlocks,ParameterValue='10.1.11.0/24,10.1.12.0/24,10.1.13.0/24'" \
 			"ParameterKey=SubnetPublicCidrBlocks,ParameterValue='10.1.1.0/24,10.1.2.0/24,10.1.3.0/24'" \
@@ -118,6 +119,7 @@ update-app: upload-app
 			"ParameterKey=Region,ParameterValue=${REGION}" \
 			"ParameterKey=EcsInstanceType,ParameterValue=t2.small" \
 			"ParameterKey=SshKeyName,ParameterValue=${KEY_NAME}" \
+			"ParameterKey=PublicDomainName,ParameterValue=${DOMAIN}" \
 		--tags \
 			"Key=Email,Value=${EMAIL}" \
 			"Key=Environment,Value=${ENV}" \

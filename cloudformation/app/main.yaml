@@ -78,6 +78,10 @@ Parameters:
     Description: User FirstLastName
     Type: String
 
+  PublicDomainName:
+    Description: Public Domain Name for sites and services created by this stack.
+    Type: String
+
 Resources:
 
   ServerLoadBalancer:
@@ -87,7 +91,7 @@ Resources:
       Parameters:
         AppStackName: !Sub ${AppStackName}-server
         FoundationStackName: !Ref FoundationStackName
-        DnsHostedZoneName: riglet.io
+        DnsHostedZoneName: !Ref PublicDomainName
         DnsSubdomainName: !Sub ${Environment}-bookit-server
 
   WebLoadBalancer:
@@ -97,7 +101,7 @@ Resources:
       Parameters:
         AppStackName: !Sub ${AppStackName}-web
         FoundationStackName: !Ref FoundationStackName
-        DnsHostedZoneName: riglet.io
+        DnsHostedZoneName: !Ref PublicDomainName
         DnsSubdomainName: !Sub ${Environment}-bookit-web
 
   Cluster:
