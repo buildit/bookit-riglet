@@ -12,8 +12,8 @@ Parameters:
     Description: Foundation stack name
     Type: String
 
-  PublicFQDN:
-    Description: Public Fully Qualified Domain Name
+  PublicDomainName:
+    Description: Public Domain Name for sites and services created by this stack.
     Type: String
 
 Resources:
@@ -23,7 +23,7 @@ Resources:
       HostedZoneConfig:
         Comment: !Sub "${Environment} Public DNS"
       Name:
-        Ref: PublicFQDN
+        Ref: PublicDomainName
 
 Outputs:
   ZoneId:
@@ -35,6 +35,6 @@ Outputs:
   FQDN:
     Description: Fully Qualified Domain Name
     Export:
-      Name: !Sub "${FoundationStackName}--FQDN"
+      Name: !Sub "${FoundationStackName}--TLDN"
     Value:
-      Ref: PublicFQDN
+      Ref: PublicDomainName
