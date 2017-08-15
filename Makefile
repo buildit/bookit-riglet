@@ -145,7 +145,7 @@ outputs-foundation:
 status-app:
 	@aws cloudformation describe-stacks \
                 --region ${REGION} \
-		--stack-name "${OWNER}-${PROJECT}-${ENV}" \
+		--stack-name "${OWNER}-${PROJECT}-${ENV}-app" \
 		--query "Stacks[][StackStatus] | []" | jq
 
 
@@ -153,7 +153,7 @@ status-app:
 outputs-app:
 	@aws cloudformation describe-stacks \
                 --region ${REGION} \
-		--stack-name "${OWNER}-${PROJECT}-${ENV}" \
+		--stack-name "${OWNER}-${PROJECT}-${ENV}-app" \
 		--query "Stacks[][Outputs] | []" | jq
 
 
@@ -166,7 +166,7 @@ delete-foundation:
 ## Deletes the App CF stack
 delete-app:
 	@if ${MAKE} .prompt-yesno message="Are you sure you wish to delete the Project ${PROJECT} Stack?"; then \
-		aws cloudformation delete-stack --region ${REGION} --stack-name "${OWNER}-${PROJECT}-${ENV}"; \
+		aws cloudformation delete-stack --region ${REGION} --stack-name "${OWNER}-${PROJECT}-${ENV}-app"; \
 	fi
 
 ## Upload CF Templates to S3
