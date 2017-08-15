@@ -82,6 +82,11 @@ Parameters:
     Description: Public Domain Name for sites and services created by this stack.
     Type: String
 
+  BuildUserAccessKeySerial:
+    Description: Increment this value by one to rotate the build user key.
+    Type: Number
+    Default: 0
+
 Resources:
 
   ServerLoadBalancer:
@@ -164,6 +169,14 @@ Resources:
         Repository: !Ref WebRepository
         ContainerPort: 80
         BookitApiDomainName: !Sub http://${Environment}-bookit-server.riglet.io
+
+  BookitBuildUser:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub https://s3.amazonaws.com/${InfraDevBucket}/templates/build-user.yaml
+      Parameters:
+        AccessKeySerial: !Ref BuildUserAccessKeySerial
+
 
 Outputs:
 
