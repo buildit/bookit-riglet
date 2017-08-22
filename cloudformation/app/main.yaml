@@ -87,6 +87,10 @@ Parameters:
     Type: Number
     Default: 0
 
+  ParameterStoreNamespace:
+    Description: Namespace in parameter store from which configuration values will be taken.
+    Type: String
+
 Resources:
 
   ServerLoadBalancer:
@@ -154,6 +158,7 @@ Resources:
         TargetGroup: !GetAtt ServerLoadBalancer.Outputs.TargetGroup
         Repository: !Ref ServerRepository
         ContainerPort: 8888
+        ParameterStoreNamespace: !Ref ParameterStoreNamespace
 
   BookitWebService:
     DependsOn:
@@ -168,6 +173,7 @@ Resources:
         TargetGroup: !GetAtt WebLoadBalancer.Outputs.TargetGroup
         Repository: !Ref WebRepository
         ContainerPort: 80
+        ParameterStoreNamespace: !Ref ParameterStoreNamespace
         BookitApiDomainName: !Sub http://${Environment}-bookit-server.riglet.io
 
   BookitBuildUser:

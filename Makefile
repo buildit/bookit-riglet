@@ -70,6 +70,7 @@ create-app: upload-app
 			"ParameterKey=EcsInstanceType,ParameterValue=t2.small" \
 			"ParameterKey=SshKeyName,ParameterValue=${KEY_NAME}" \
 			"ParameterKey=PublicDomainName,ParameterValue=${DOMAIN}" \
+			"ParameterKey=ParameterStoreNamespace,ParameterValue=/bookit/${ENV}" \
 		--tags \
 			"Key=Email,Value=${EMAIL}" \
 			"Key=Environment,Value=${ENV}" \
@@ -120,6 +121,7 @@ update-app: upload-app
 			"ParameterKey=EcsInstanceType,ParameterValue=t2.small" \
 			"ParameterKey=SshKeyName,ParameterValue=${KEY_NAME}" \
 			"ParameterKey=PublicDomainName,ParameterValue=${DOMAIN}" \
+			"ParameterKey=ParameterStoreNamespace,ParameterValue=/bookit/${ENV}" \
 		--tags \
 			"Key=Email,Value=${EMAIL}" \
 			"Key=Environment,Value=${ENV}" \

@@ -28,6 +28,9 @@ Parameters:
   ContainerPort:
     Type: Number
 
+  ParameterStoreNamespace:
+    Type: String
+
 Resources:
   ECSServiceRole:
     Type: AWS::IAM::Role
@@ -106,3 +109,5 @@ Resources:
               Value: !Ref BookitApiDomainName
             - Name: BOOKIT_API_BASE_URL   # This is a logical URL used by the Bookit app itself to define the endpoint it talks to.
               Value: /api  # Mapped to the ACTUAL_BOOKIT_API_URL via a reverse proxy config in nginx.
+            - Name: PARAMETER_STORE_NAMESPACE
+              Value: !Ref ParameterStoreNamespace
