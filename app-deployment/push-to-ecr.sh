@@ -22,6 +22,5 @@ fi
 eval $(aws ecr get-login | sed 's/-e none//')
 
 echo "Preparing to tag, repo:  ${REPO},  sha: ${COMMIT_SHA}"
-docker build -t "${REPO}:${COMMIT_SHA}" -t "${REPO}:latest" .
+docker build -t "${REPO}:${COMMIT_SHA}" .
 docker push "${REPO}:${COMMIT_SHA}"
-docker push "${REPO}:latest"
