@@ -19,6 +19,7 @@ export AWS_REGION=${REGION}
 # When completely empty, can be destroyed with `make destroy-deps`
 deps:
 	@./cloudformation/scripts/create-buckets.sh
+	@./cloudformation/scripts/create-ecr-repos.sh
 
 # Destroy dependency S3 buckets, only destroy if empty
 destroy-deps:
