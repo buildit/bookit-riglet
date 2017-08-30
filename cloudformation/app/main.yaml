@@ -174,7 +174,7 @@ Resources:
         Repository: !Ref WebRepository
         ContainerPort: 80
         ParameterStoreNamespace: !Ref ParameterStoreNamespace
-        BookitApiDomainName: !Sub http://${Environment}-bookit-server.riglet.io
+        BookitApiDomainName: !Sub https://${Environment}-bookit-server.${PublicDomainName}
 
   BookitBuildUser:
     Type: AWS::CloudFormation::Stack

@@ -29,8 +29,8 @@ Resources:
       SecurityGroupIngress:
         - CidrIp: "0.0.0.0/0"
           IpProtocol: "TCP"
-          FromPort: 80
-          ToPort: 80
+          FromPort: 443
+          ToPort: 443
       VpcId:
         Fn::ImportValue: !Sub "${FoundationStackName}--VpcId"
 
@@ -47,8 +47,10 @@ Resources:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       LoadBalancerArn: !Ref LoadBalancer
-      Port: 80
-      Protocol: HTTP
+      Certificates:
+        - CertificateArn: arn:aws:acm:us-east-1:006393696278:certificate/0663e927-e990-4157-aef9-7dea87faa6ec
+      Port: 443
+      Protocol: HTTPS
       DefaultActions:
         - Type: forward
           TargetGroupArn: !Ref TargetGroup
