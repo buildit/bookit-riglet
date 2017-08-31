@@ -7,5 +7,5 @@ function makeRepo() {
 }
 
 makeRepo server
-makeRepo app
+makeRepo web
 

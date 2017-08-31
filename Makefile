@@ -21,9 +21,10 @@ deps:
 	@./cloudformation/scripts/create-buckets.sh
 	@./cloudformation/scripts/create-ecr-repos.sh
 
-# Destroy dependency S3 buckets, only destroy if empty
+# Destroy dependency S3 buckets and ECR repositories, only destroy if empty
 destroy-deps:
-	@./cloudformation/scripts/destroy-deps.sh
+	@./cloudformation/scripts/destroy-buckets.sh
+	@./cloudformation/scripts/destroy-ecr-repos.sh
 
 ## Creates Foundation and Build
 
