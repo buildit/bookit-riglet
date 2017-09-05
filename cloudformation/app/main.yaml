@@ -176,14 +176,6 @@ Resources:
         ParameterStoreNamespace: !Ref ParameterStoreNamespace
         BookitApiDomainName: !Sub https://${Environment}-bookit-server.${PublicDomainName}
 
-  BookitBuildUser:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: !Sub https://s3.amazonaws.com/${InfraDevBucket}/templates/build-user.yaml
-      Parameters:
-        AccessKeySerial: !Ref BuildUserAccessKeySerial
-
-
 Outputs:
 
   ServerLoadBalancerUrl:

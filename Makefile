@@ -26,6 +26,10 @@ destroy-deps:
 	@./cloudformation/scripts/destroy-buckets.sh
 	@./cloudformation/scripts/destroy-ecr-repos.sh
 
+## Create IAM user used for building the application
+create-iam-user:
+	@./scripts/create-iam-user.sh "${OWNER}" "${PROJECT}"
+
 ## Creates Foundation and Build
 
 ## Creates a new CF stack
