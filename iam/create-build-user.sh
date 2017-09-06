@@ -5,7 +5,7 @@ echo
 
 if [[ -z $1 && -z $2 ]] ; then
     echo 'Missing command line arguments'
-    echo 'USAGE: create-iam-user.sh <Owner> <Project>'
+    echo 'USAGE: create-build-user.sh <Owner> <Project>'
     exit 1
 fi
 

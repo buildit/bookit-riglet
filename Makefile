@@ -19,16 +19,22 @@ export AWS_REGION=${REGION}
 # When completely empty, can be destroyed with `make destroy-deps`
 deps:
 	@./cloudformation/scripts/create-buckets.sh
+
+# Destroy dependency S3 buckets, only destroy if empty
+destroy-deps:
+	@./cloudformation/scripts/destroy-ecr-repos.sh
+
+# Create dependency ECR repositories
+create-repos:
 	@./cloudformation/scripts/create-ecr-repos.sh
 
-# Destroy dependency S3 buckets and ECR repositories, only destroy if empty
-destroy-deps:
-	@./cloudformation/scripts/destroy-buckets.sh
+# Destroy ECR repositories, only destroy if empty
+destroy-repos:
 	@./cloudformation/scripts/destroy-ecr-repos.sh
 
 ## Create IAM user used for building the application
 create-iam-user:
-	@./scripts/create-iam-user.sh "${OWNER}" "${PROJECT}"
+	@./iam/create-build-user.sh "${OWNER}" "${PROJECT}"
 
 ## Creates Foundation and Build
 
@@ -77,6 +83,8 @@ create-app: upload-app
 			"ParameterKey=SshKeyName,ParameterValue=${KEY_NAME}" \
 			"ParameterKey=PublicDomainName,ParameterValue=${DOMAIN}" \
 			"ParameterKey=ParameterStoreNamespace,ParameterValue=/bookit/${ENV}" \
+			"ParameterKey=ServerRepository,ParameterValue=${OWNER}-${PROJECT}-server-ecr-repo" \
+			"ParameterKey=WebRepository,ParameterValue=${OWNER}-${PROJECT}-web-ecr-repo" \
 		--tags \
 			"Key=Email,Value=${EMAIL}" \
 			"Key=Environment,Value=${ENV}" \

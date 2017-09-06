@@ -91,6 +91,14 @@ Parameters:
     Description: Namespace in parameter store from which configuration values will be taken.
     Type: String
 
+  ServerRepository:
+    Description: Cluster repository name for bookit server
+    Type: String
+
+  WebRepository:
+    Description: Cluster repository name for bookit web
+    Type: String
+
 Resources:
 
   ServerLoadBalancer:
@@ -128,22 +136,6 @@ Resources:
         InstanceType: !Ref EcsInstanceType
         ClusterSize: !Ref EcsClusterSize
         SshKeyName: !Ref SshKeyName
-
-  ServerRepository:
-    Type: AWS::ECR::Repository
-    # Hate to do this, but this *will* cause stack-deletion errors if the repo
-    # has any images in it, which any self-respecting repo will have.
-    DeletionPolicy: Retain
-    Properties:
-      RepositoryName: !Join [ '-', [ !Ref AppStackName, 'server', 'ecr', 'repo' ] ]
-
-  WebRepository:
-    Type: AWS::ECR::Repository
-    # Hate to do this, but this *will* cause stack-deletion errors if the repo
-    # has any images in it, which any self-respecting repo will have.
-    DeletionPolicy: Retain
-    Properties:
-      RepositoryName: !Join [ '-', [ !Ref AppStackName, 'web', 'ecr', 'repo' ] ]
 
   BookitServerService:
     DependsOn:
