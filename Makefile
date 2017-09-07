@@ -22,7 +22,7 @@ deps:
 
 # Destroy dependency S3 buckets, only destroy if empty
 destroy-deps:
-	@./cloudformation/scripts/destroy-ecr-repos.sh
+	@./cloudformation/scripts/destroy-buckets.sh
 
 # Create dependency ECR repositories
 create-repos:
