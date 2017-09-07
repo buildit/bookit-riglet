@@ -39,7 +39,7 @@ create-iam-user:
 ## Creates Foundation and Build
 
 ## Creates a new CF stack
-create-foundation: upload
+create-foundation: upload-foundation
 	@aws cloudformation create-stack --stack-name "${OWNER}-${PROJECT}-${ENV}-foundation" \
                 --region ${REGION} \
 		--template-body "file://cloudformation/foundation/main.yaml" \
@@ -93,7 +93,7 @@ create-app: upload-app
 
 
 ## Updates existing Foundation CF stack
-update-foundation: upload
+update-foundation: upload-foundation
 	@aws cloudformation update-stack --stack-name "${OWNER}-${PROJECT}-${ENV}-foundation" \
                 --region ${REGION} \
 		--template-body "file://cloudformation/foundation/main.yaml" \
@@ -136,6 +136,8 @@ update-app: upload-app
 			"ParameterKey=SshKeyName,ParameterValue=${KEY_NAME}" \
 			"ParameterKey=PublicDomainName,ParameterValue=${DOMAIN}" \
 			"ParameterKey=ParameterStoreNamespace,ParameterValue=/bookit/${ENV}" \
+			"ParameterKey=ServerRepository,ParameterValue=${OWNER}-${PROJECT}-server-ecr-repo" \
+            "ParameterKey=WebRepository,ParameterValue=${OWNER}-${PROJECT}-web-ecr-repo" \
 		--tags \
 			"Key=Email,Value=${EMAIL}" \
 			"Key=Environment,Value=${ENV}" \
@@ -187,13 +189,13 @@ delete-app:
 
 ## Upload CF Templates to S3
 # Uploads foundation templates to the Foundation bucket
-upload:
+upload-foundation:
 	@aws s3 cp --recursive cloudformation/foundation/ s3://rig.${OWNER}.${PROJECT}.${ENV}.${REGION}.foundation/templates/
 
 
 ## Upload CF Templates for project
 # Note that these templates will be stored in your InfraDev Project **shared** bucket:
-upload-app:
+upload-app: upload-app-deployment
 	@aws s3 cp --recursive cloudformation/app/ s3://rig.${OWNER}.${PROJECT}.${ENV}.${REGION}.app/templates/
 	pwd=$(shell pwd)
 	cd cloudformation/app/ && zip templates.zip *.yaml
