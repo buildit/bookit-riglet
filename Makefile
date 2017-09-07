@@ -33,7 +33,7 @@ destroy-repos:
 	@./cloudformation/scripts/destroy-ecr-repos.sh
 
 ## Create IAM user used for building the application
-create-iam-user:
+create-build-user:
 	@./iam/create-build-user.sh "${OWNER}" "${PROJECT}"
 
 ## Creates Foundation and Build
