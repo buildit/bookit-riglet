@@ -21,7 +21,7 @@ Resources:
     Type: AWS::Route53::HostedZone
     Properties:
       HostedZoneConfig:
-        Comment: !Sub "${Environment} Public DNS"
+        Comment: !Sub "${FoundationStackName} Public DNS"
       Name:
         Ref: PublicDomainName
 
