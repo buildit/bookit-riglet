@@ -3,7 +3,7 @@
 echo 'Creating build user...'
 echo
 
-if [[ -z $1 && -z $2 ]] ; then
+if [[ -z $1 || -z $2 ]] ; then
     echo 'Missing command line arguments'
     echo 'USAGE: create-build-user.sh <Owner> <Project>'
     exit 1
